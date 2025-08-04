@@ -5,6 +5,8 @@ import dotenv from 'dotenv';
 import Redis from 'ioredis';
 import mongoose from 'mongoose';
 import { createAdapter } from "@socket.io/redis-adapter";
+import {userRouter} from './routes/userRoutes';
+import {messageRouter} from './routes/messageRouter'
 
 dotenv.config();
 
@@ -21,6 +23,9 @@ const sub = new Redis();
 const HEARTBEAT_INTERVAL = 30000;
 const USER_TTL = 60;
 const mongodb = process.env.MONGODB_URL;
+
+app.use('/api/v1', userRouter);
+app.use('/api/v1', messageRouter);
 
 const io = new Server(httpserver, {
     cors: {

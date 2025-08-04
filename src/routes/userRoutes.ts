@@ -1,7 +1,7 @@
 import express,{Request,Response, RequestHandler} from 'express'
 import {signup,login,updateProfile, checkAuth, getProfile} from '../controllers/userController';
 import { authmiddleware } from '../middleware/middlewares';
-export const router = express.Router();
+const router = express.Router();
 
 router.post("/signup", (req, res) => { 
     signup(req,res);
@@ -18,4 +18,5 @@ router.get("/check", authmiddleware as RequestHandler,(req,res)=>{
 router.get("/profile", authmiddleware as RequestHandler, (req,res) => {
     getProfile(req,res);
 });
+export { router as userRouter};
 
