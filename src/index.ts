@@ -3,6 +3,7 @@ import { createServer } from 'http';
 import { Server, Socket } from 'socket.io';
 import dotenv from 'dotenv';
 import Redis from 'ioredis';
+import mongoose from 'mongoose';
 import { createAdapter } from "@socket.io/redis-adapter";
 
 dotenv.config();
@@ -19,7 +20,7 @@ const pub = new Redis();
 const sub = new Redis();
 const HEARTBEAT_INTERVAL = 30000;
 const USER_TTL = 60;
-
+const mongodb = process.env.MONGODB_URL;
 
 const io = new Server(httpserver, {
     cors: {
@@ -97,7 +98,7 @@ io.on('connection', (socket: Socket) => {
             clearInterval(heartbeatInterval);
         }
 
-        
+
         const keys = await pub.hkeys("online_users");
         for (const userId of keys) {
             const id = await pub.hget("online_users", userId);
@@ -112,6 +113,12 @@ io.on('connection', (socket: Socket) => {
 });
 
 
-httpserver.listen(PORT, () => {
-    console.log(`server running on port ${PORT}`);
+httpserver.listen(PORT, async() => {
+    console.log("Server is running on port " + PORT);
+    try {
+        await mongoose.connect(mongodb as string);
+        console.log("Connected to database successfully");
+    } catch (error) {
+        console.error("Database connection failed:", error);
+    }
 });
